@@ -1,5 +1,6 @@
 (import [django.contrib [admin]])
-(import [django.urls [path]])
+(import [django.urls [include path]])
 
 (setv urlpatterns
-      [(path "admin/" (. admin site urls))])
+      [(path "admin/" (. admin site urls))
+       (path "polls/" (include "polls.urls"))])
