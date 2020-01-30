@@ -1,3 +1,4 @@
-(import [django.contrib [admin]])
+(import [django.contrib [admin]]
+        [polls.models [Question]])
 
-# Register your models here.
+(admin.site.register Question)
