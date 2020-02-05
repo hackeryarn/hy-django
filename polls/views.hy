@@ -1,25 +1,37 @@
 (import [django.shortcuts [render get_object_or_404]]
-        [django.http [HttpResponse]]
-        [polls.models [Question]])
+        [django.http [HttpResponse HttpResponseRedirect]]
+        [django.urls [reverse]]
+        [polls.models [Choice Question]])
 
-(defn assoc-pipe [struct key val]
-  (assoc struct key val)
-  struct)
+(defn ->dict [&rest pairs]
+  (dict (partition pairs)))
 
 (defn index [request]
   (->> (Question.objects.order_by "-pub_date")
        (take 5)
-       (assoc-pipe {} "latest_question_list")
+       (->dict "latest_question_list")
        (render request "polls/index.html")))
 
 (defn detail [request question_id]
   (->> (get_object_or_404 Question :pk question_id)
-       (assoc-pipe {} "question")
+       (->dict "question")
        (render request "polls/detail.html")))
 
 (defn results [request question_id]
-  (setv response "You're lookint at the results of question %s.")
-  (HttpResponse (% response question_id)))
+  (->> (get_object_or_404 Question :pk question_id)
+      (->dict "question")
+      (render request "polls/results.html")))
 
 (defn vote [request question_id]
-  (HttpResponse (% "You're voting on question %s." question_id)))
+  (setv question (get_object_or_404 Question :pk question_id))
+  (try
+    (setv selected_choice (.choice_set.get question :pk (. request POST ["choice"])))
+    (except [[KeyError Choice.DoesNotExist]]
+      (return (render request
+                      "polls/detail.html"
+                      {"question" question
+                       "error_message" "You didn't select a choice."})))
+    (else
+      (+= selected_choice.votes 1)
+      (.save selected_choice)
+      (HttpResponseRedirect (reverse "polls:results" :args [question.id])))))
