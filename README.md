@@ -14,5 +14,5 @@ Hy for the entire project.
 $ pip install django
 
 # Newer version of python require the git version of hy.
-$ pip insatll git+https://github.com/hylang/hy.git
+$ pip install git+https://github.com/hylang/hy.git
 ```

@@ -11,7 +11,10 @@
     self.question_text)
 
   (defn was_published_recently [self]
-    (>= self.pub_date (- (timezone.now) (datetime.timedelta :days 1)))))
+    (setv now (.now timezone))
+    (<= (- now (.timedelta datetime :days 1))
+        self.pub_date
+        now)))
 
 (defclass Choice [models.Model]
   (setv question (models.ForeignKey Question :on_delete models.CASCADE)

@@ -1,6 +1,7 @@
 (import [django.shortcuts [render get_object_or_404]]
         [django.http [HttpResponseRedirect]]
         [django.urls [reverse]]
+        [django.utils [timezone]]
         [django.views [generic]]
         [polls.models [Choice Question]])
 
@@ -12,8 +13,10 @@
         context_object_name "latest_question_list")
 
   (defn get_queryset [self]
-    (->> (Question.objects.order_by "-pub_date")
-         (take 5))))
+    (setv questions (-> (.filter Question.objects :pub_date__lte (.now timezone))
+                        (.order_by "-pub_date")))
+    (take 5 questions)))
+
 
 (defclass DetailView [generic.DetailView]
   (setv model Question
@@ -26,7 +29,7 @@
 (defn vote [request question_id]
   (setv question (get_object_or_404 Question :pk question_id))
   (try
-    (setv selected_choice (.choice_set.get question :pk (. request POST ["choice"])))
+    (setv selected_choice (.get question.choice_set :pk (. request POST ["choice"])))
     (except [[KeyError Choice.DoesNotExist]]
       (return (render request
                       "polls/detail.html"
