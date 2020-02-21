@@ -15,7 +15,7 @@
   (defn get_queryset [self]
     (setv questions (-> (.filter Question.objects :pub_date__lte (.now timezone))
                         (.order_by "-pub_date")))
-    (take 5 questions)))
+    (list (take 5 questions))))
 
 
 (defclass DetailView [generic.DetailView]
