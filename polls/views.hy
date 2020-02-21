@@ -20,7 +20,10 @@
 
 (defclass DetailView [generic.DetailView]
   (setv model Question
-        template_name "polls/detail.html"))
+        template_name "polls/detail.html")
+
+  (defn get_queryset [self]
+    (.filter Question.objects :pub_date__lte (.now timezone))))
 
 (defclass ResultsView [generic.DetailView]
   (setv model Question

@@ -49,3 +49,18 @@
                           (. response context ["latest_question_list"])
                           ["<Question: Past question 2.>"
                            "<Question: Past question 1.>"])))
+
+(defclass QuestionDetailViewTests [TestCase]
+  (defn test_future_question [self]
+    (setv future_question (create_question :question_text "Future question."
+                                           :days 5)
+          url (reverse "polls:detail" :args [future_question.id])
+          response (.get self.client url))
+    (.assertEqual self response.status_code 404))
+
+  (defn test_past_question [self]
+    (setv past_question (create_question :question_text "Past quyestion."
+                                         :days -5)
+          url (reverse "polls:detail" :args [past_question.id])
+          response (.get self.client url))
+    (.assertContains self response past_question.question_text)))
