@@ -14,7 +14,11 @@
     (setv now (.now timezone))
     (<= (- now (.timedelta datetime :days 1))
         self.pub_date
-        now)))
+        now))
+
+  (setv was_published_recently.admin_order_field "pub_date"
+        was_published_recently.boolean True
+        was_published_recently.short_descriptions "Published recently?"))
 
 (defclass Choice [models.Model]
   (setv question (models.ForeignKey Question :on_delete models.CASCADE)
